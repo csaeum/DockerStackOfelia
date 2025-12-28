@@ -1,0 +1,26 @@
+# Git Archive Export Configuration
+# Files and directories excluded from releases (ZIP/TAR.gz)
+
+# CI/CD Configuration
+.github/ export-ignore
+.gitlab-ci.yml export-ignore
+
+# IDE Settings
+.idea/ export-ignore
+.vscode/ export-ignore
+.claude/ export-ignore
+
+# Git Files
+.gitignore export-ignore
+.gitattributes export-ignore
+
+# Documentation (Development)
+*.md.backup export-ignore
+
+# Test Files
+tests/ export-ignore
+test/ export-ignore
+
+# Log files (keep directory structure, but not content)
+logs/*.log export-ignore
+logs/*.gz export-ignore

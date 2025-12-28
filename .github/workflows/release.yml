@@ -1,0 +1,93 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create release archive
+        run: |
+          git archive --format=zip --output=DockerStackOfelia.zip HEAD
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Extract changelog from tag message or use generic message
+          if git tag -l --format='%(contents)' ${{ steps.version.outputs.tag }} | grep -q .; then
+            CHANGELOG=$(git tag -l --format='%(contents)' ${{ steps.version.outputs.tag }})
+          else
+            CHANGELOG="Release version ${{ steps.version.outputs.version }}"
+          fi
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: DockerStackOfelia.zip
+          body: |
+            ## Docker Ofelia Stack v${{ steps.version.outputs.version }}
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            ### Installation
+
+            1. Download and extract `DockerStackOfelia.zip`
+            2. Copy `.env.example` to `.env` and adjust settings
+            3. Run `docker-compose up -d`
+
+            ### What's Changed
+
+            See full changelog in the [commit history](https://github.com/${{ github.repository }}/commits/${{ steps.version.outputs.tag }})
+
+            ---
+
+            **Made with ❤️ by WSC - Web SEO Consulting**
+
+            [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/csaeum)
+            [![GitHub Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-ea4aaa?style=for-the-badge&logo=github-sponsors&logoColor=white)](https://github.com/sponsors/csaeum)
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build containers
+        run: docker-compose build
+
+      - name: Test stack
+        run: |
+          docker-compose up -d
+          sleep 15
+          docker-compose ps
+          docker-compose logs
+          docker-compose down
