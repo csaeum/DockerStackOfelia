@@ -1,6 +1,7 @@
+---
 name: Release
 
-on:
+'on':
   push:
     tags:
       - 'v*.*.*'
@@ -57,14 +58,14 @@ jobs:
 
             ### What's Changed
 
-            See full changelog in the [commit history](https://github.com/${{ github.repository }}/commits/${{ steps.version.outputs.tag }})
+            See full changelog in commit history.
 
             ---
 
             **Made with ❤️ by WSC - Web SEO Consulting**
 
-            [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/csaeum)
-            [![GitHub Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-ea4aaa?style=for-the-badge&logo=github-sponsors&logoColor=white)](https://github.com/sponsors/csaeum)
+            Support: [Buy Me a Coffee](https://buymeacoffee.com/csaeum) |
+            [GitHub Sponsors](https://github.com/sponsors/csaeum)
           generate_release_notes: true
           draft: false
           prerelease: false

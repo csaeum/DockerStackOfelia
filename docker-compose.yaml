@@ -1,3 +1,4 @@
+---
 services:
   ofelia:
     image: mcuadros/ofelia:latest
